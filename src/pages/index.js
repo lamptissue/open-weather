@@ -20,24 +20,6 @@ export default function Home() {
   };
   console.log("weather data", weatherData);
 
-  const currentDate = new Date();
-  const currentHour = currentDate.getHours();
-  console.log("current", currentDate);
-  console.log("hour", currentHour);
-
-  const currenttpoo = new Date().toISOString().split("T")[0]; // Current date in YYYY-MM-DD format
-  console.log("poo", currenttpoo);
-
-  if (currentHour < 12) {
-    console.log("its before 12pm");
-  } else if (currentHour < 15) {
-    console.log("its before 3pm");
-  } else if (currentHour < 18) {
-    console.log("its before 6pm");
-  } else if (currentHour < 21) {
-    console.log("its before 9pm");
-  }
-
   const handleInputChange = (e) => {
     setSelectCity(e.target.value);
   };
@@ -54,10 +36,41 @@ export default function Home() {
     return (celsius * 9) / 5 + 32;
   }
 
-  //filtered dates
+  const filteredWeather = () => {
+    if (!weatherData) {
+      console.log("no weather data mate");
+      return [];
+    }
 
-  //today filtered
+    // return weatherData.list
+    //   .filter((item) => item.dt_txt.includes("12:00:00"))
+    //   .map((item) => {
+    //     const weather = item.weather[0];
+    //     const date = new Date(item.dt * 1000).toDateString();
+    //     return { weather, date };
+    //   });
+    return weatherData.list.filter((item) => item.dt_txt.includes("12:00:00"));
+  };
 
+  const todayDate = new Date();
+  const currentHour = todayDate.getHours();
+  const currentTime = todayDate.toISOString().split("T")[0];
+  let filteredData;
+  if (weatherData) {
+    if (currentHour < 12) {
+      console.log("Filtered Weather before 12:", filteredWeather());
+    } else if (currentHour >= 15) {
+      filteredData = weatherData.list.find((item) => item.dt_txt.includes(currentTime));
+    }
+  }
+  let newData = [...filteredWeather()];
+
+  // If filteredData is defined, add it to newData
+  if (filteredData) {
+    newData.unshift(filteredData);
+  }
+
+  console.log("new york baby", newData);
   return (
     <main>
       <div>
@@ -110,6 +123,24 @@ export default function Home() {
                 </div>
               );
             })}
+
+          {newData.map((item) => {
+            const date = new Date(item.dt * 1000).toDateString();
+            const weather = item.weather[0];
+            return (
+              <div key={item.dt} className='test-box'>
+                <p>{date}</p>
+                <img src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`} />
+
+                <p>{weather.description} </p>
+                <p>
+                  {unitTemperature === "metric"
+                    ? `${item.main.temp.toFixed(0)}°C`
+                    : `${celsiusToFahrenheit(item.main.temp).toFixed(0)}°F`}
+                </p>
+              </div>
+            );
+          })}
         </>
       ) : (
         <h1>Wrong city</h1>
