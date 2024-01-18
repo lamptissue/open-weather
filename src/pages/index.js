@@ -10,7 +10,7 @@ export default function Home() {
   const fetchData = async () => {
     try {
       const geoResponse = await fetch(
-        `http://api.openweathermap.org/data/2.5/forecast?q=${selectCity}&appid=${apiKey}&units=${unitTemperature}`
+        `https://api.openweathermap.org/data/2.5/forecast?q=${selectCity}&appid=${apiKey}&units=${unitTemperature}`
       );
       const data = await geoResponse.json();
       if (data.cod === "200") {
