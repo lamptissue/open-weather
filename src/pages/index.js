@@ -3,8 +3,9 @@ export default function Home() {
   const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 
   const [weatherData, setWeatherData] = useState(null);
-  const [selectCity, setSelectCity] = useState("london");
+  const [selectCity, setSelectCity] = useState("");
   const [unitTemperature, setUnitTemperature] = useState("metric");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const fetchData = async () => {
     try {
@@ -12,8 +13,12 @@ export default function Home() {
         `http://api.openweathermap.org/data/2.5/forecast?q=${selectCity}&appid=${apiKey}&units=${unitTemperature}`
       );
       const data = await geoResponse.json();
-
-      setWeatherData(data);
+      if (data.cod === "200") {
+        setWeatherData(data);
+      } else {
+        setWeatherData(null);
+        setErrorMessage("not a valid location");
+      }
     } catch (error) {
       console.error("Error:", error);
     }
@@ -22,6 +27,7 @@ export default function Home() {
 
   const handleInputChange = (e) => {
     setSelectCity(e.target.value);
+    setErrorMessage("");
   };
 
   const handleSubmit = (e) => {
@@ -36,41 +42,21 @@ export default function Home() {
     return (celsius * 9) / 5 + 32;
   }
 
-  const filteredWeather = () => {
-    if (!weatherData) {
-      console.log("no weather data mate");
-      return [];
-    }
-
-    // return weatherData.list
-    //   .filter((item) => item.dt_txt.includes("12:00:00"))
-    //   .map((item) => {
-    //     const weather = item.weather[0];
-    //     const date = new Date(item.dt * 1000).toDateString();
-    //     return { weather, date };
-    //   });
-    return weatherData.list.filter((item) => item.dt_txt.includes("12:00:00"));
-  };
+  const filteredWeather = weatherData ? weatherData.list.filter((item) => item.dt_txt.includes("12:00:00")) : [];
 
   const todayDate = new Date();
   const currentHour = todayDate.getHours();
   const currentTime = todayDate.toISOString().split("T")[0];
-  let filteredData;
+  let filterTodayWeather;
+  let newData = [...filteredWeather];
+
   if (weatherData) {
-    if (currentHour < 12) {
-      console.log("Filtered Weather before 12:", filteredWeather());
-    } else if (currentHour >= 15) {
-      filteredData = weatherData.list.find((item) => item.dt_txt.includes(currentTime));
+    if (currentHour > 12) {
+      filterTodayWeather = weatherData.list.find((item) => item.dt_txt.includes(currentTime));
+      newData.unshift(filterTodayWeather);
     }
   }
-  let newData = [...filteredWeather()];
-
-  // If filteredData is defined, add it to newData
-  if (filteredData) {
-    newData.unshift(filteredData);
-  }
-
-  console.log("new york baby", newData);
+  console.log("new", newData);
   return (
     <main>
       <div>
@@ -97,54 +83,41 @@ export default function Home() {
           Submit
         </button>
       </div>
-      {!weatherData ? (
-        <h1>Select a city</h1>
-      ) : weatherData.cod === "200" ? (
+      {errorMessage && <p className='error-message'>{errorMessage}</p>}
+
+      {weatherData && (
         <>
           <h1>
             5 day weather for {weatherData.city.name}, {weatherData.city.country}
           </h1>
-          {weatherData.list
-            .filter((item) => item.dt_txt.includes("12:00:00"))
-            .map((item) => {
-              const weather = item.weather[0];
+          <div className='testContainer'>
+            {newData.map((item) => {
               const date = new Date(item.dt * 1000).toDateString();
+              const weather = item.weather[0];
               return (
                 <div key={item.dt} className='test-box'>
                   <p>{date}</p>
                   <img src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`} />
-
                   <p>{weather.description} </p>
                   <p>
+                    Temperature:
                     {unitTemperature === "metric"
                       ? `${item.main.temp.toFixed(0)}°C`
                       : `${celsiusToFahrenheit(item.main.temp).toFixed(0)}°F`}
                   </p>
+                  <p>Wind: {item.wind.speed}m/s</p>
+                  {item.pop ? <p>Chance of rain: {item.pop * 100}%</p> : ""}
+                  {item.rain && `Rain: ${item.rain["3h"]} mm`}
+                  <p>Humidity: {item.main.humidity}</p>
+                  <p>Pressure: {item.main.pressure}</p>
                 </div>
               );
             })}
-
-          {newData.map((item) => {
-            const date = new Date(item.dt * 1000).toDateString();
-            const weather = item.weather[0];
-            return (
-              <div key={item.dt} className='test-box'>
-                <p>{date}</p>
-                <img src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`} />
-
-                <p>{weather.description} </p>
-                <p>
-                  {unitTemperature === "metric"
-                    ? `${item.main.temp.toFixed(0)}°C`
-                    : `${celsiusToFahrenheit(item.main.temp).toFixed(0)}°F`}
-                </p>
-              </div>
-            );
-          })}
+          </div>
         </>
-      ) : (
-        <h1>Wrong city</h1>
       )}
     </main>
   );
 }
+
+// Empty the select weather

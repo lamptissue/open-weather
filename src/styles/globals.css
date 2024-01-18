@@ -8,8 +8,13 @@ body {
 
 .test-box {
   background-color: white;
-  width: 400px;
+  width: 150px;
   height: 200px;
   border-radius: 5px;
   border: solid black 1px;
+}
+
+.testContainer {
+  display: flex;
+  width: 100%;
 }
