@@ -1,6 +1,5 @@
 import { useState } from "react";
 import WeatherCard from "./WeatherCard";
-import TemperatureUnit from "./TemperatureUnit";
 
 export default function Home() {
   const apiKey = process.env.NEXT_PUBLIC_API_KEY;
@@ -44,8 +43,6 @@ export default function Home() {
     return (celsius * 9) / 5 + 32;
   }
 
-  console.log("weatherdata", weatherData);
-
   const todayDate = new Date();
   const currentDate = todayDate.toISOString().split("T")[0];
 
@@ -57,7 +54,6 @@ export default function Home() {
     const lastElement = filteredWeather[filteredWeather.length - 1];
 
     if (!lastElement.dt_txt.includes("12:00:00")) {
-      console.log("Last element does not have '12:00:00':", lastElement);
       fiveDayWeatherData.push(lastElement);
     }
   }
@@ -70,7 +66,8 @@ export default function Home() {
 
   return (
     <main className='bg-orange-100 min-h-screen flex justify-center items-center flex-col'>
-      <div className=' mx-auto p-5 items-cente mb-8 container'>
+      <div className=' mx-auto p-5 items-center mb-8 container'>
+        <h1 className='text-center text-5xl mb-2'>Weather ⛅️</h1>
         <div className='flex mb-6 justify-center items-center'>
           <div className='flex items-center rounded overflow-hidden shadow-md'>
             <input
@@ -90,7 +87,6 @@ export default function Home() {
             </button>
           </div>
         </div>
-
         {errorMessage && (
           <div className='flex justify-center align-center'>
             <p className='error-message font-semibold text-xl text-red-600 errorShake'>{errorMessage}</p>
@@ -148,7 +144,6 @@ export default function Home() {
           </>
         )}
         <div className='flex justify-center items-center mt-5'>
-          {/* <TemperatureUnit /> */}
           <div className='inline-flex'>
             <button
               className={` hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l ${
