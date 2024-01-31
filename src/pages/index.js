@@ -136,7 +136,14 @@ export default function Home() {
 
     if (activeCardData.snow) {
       images.push(
-        <Image src={snow} width={200} height={200} style={{ position: "absolute", top: 0, left: 0 }} alt='Snow Image' />
+        <Image
+          src={snow}
+          width={200}
+          height={200}
+          style={{ position: "absolute", top: 0, left: 0 }}
+          alt='Snow Image'
+        />,
+        <Image src={cold} width={200} height={200} style={{ position: "absolute", top: 0, left: 0 }} alt='Cold Image' />
       );
     }
 
