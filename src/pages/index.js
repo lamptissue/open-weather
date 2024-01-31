@@ -16,7 +16,7 @@ export default function Home() {
   const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 
   const [weatherData, setWeatherData] = useState(null);
-  const [selectCity, setSelectCity] = useState("london");
+  const [selectCity, setSelectCity] = useState("");
   const [unitTemperature, setUnitTemperature] = useState("metric");
   const [errorMessage, setErrorMessage] = useState("");
   const [activeCardData, setActiveCardData] = useState(null);
