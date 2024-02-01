@@ -1,9 +1,9 @@
 import { useState } from "react";
 
-import TemperatureUnit from "./TemperatureUnit";
-import Outfits from "./Outfits";
-import FiveDayWeather from "./FiveDayWeather";
-import TodayWeather from "./TodayWeather";
+import TemperatureUnit from "../components/TemperatureUnit";
+import Outfits from "../components/Outfits";
+import FiveDayWeather from "../components/FiveDayWeather";
+import TodayWeather from "../components/TodayWeather";
 
 export default function Home() {
   const apiKey = process.env.NEXT_PUBLIC_API_KEY;
